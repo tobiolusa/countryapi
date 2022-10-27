@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view
 
 @api_view(['GET', 'POST'])
 def countries_list(requests):
+    
     if requests.method == 'GET':
         countries = countries.objects.all()
         
@@ -39,4 +40,22 @@ def countries_details(requests, pk):
         countries = countries.objects.get(pk=pk)
     except countries.DoesNotExist:
         return JsonResponse({'message': 'The country do not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        countries_serializer = CountriesSerializer(countries)
+        return JsonResponse(countries_serializer.data)
+    
+    elif request.method == 'PUT':
+        countries_data = JSONParser().parse(request)
+        countries_serializer = CountriesSerializer(countries, data=countries_data)
+        if countries_serializer.is_valid():
+            countries_serializer.save()
+            return JsonResponse(countries_serializer.data)
+        return JsonResponse(countries_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    elif request.method == 'DELETE':
+        countries.delete()
+        return JsonResponse({'message':'Country was deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        
     
