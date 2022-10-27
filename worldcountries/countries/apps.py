@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CoutriesConfig(AppConfig):
+class CountriesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'coutries'
+    name = 'countries'
