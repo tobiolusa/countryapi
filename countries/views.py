@@ -1,7 +1,11 @@
+from itertools import count
 from django.shortcuts import render
 from django.http.response import JsonResponse
+from requests import request
 from rest_framework.parsers import JSONParser
 from rest_framework import status
+from django.contrib import messages
+
 
 from countries.models import Countries
 from countries.serializers import CountriesSerializer
@@ -19,3 +23,20 @@ def countries_list(requests):
             
         countries_serializer = CountriesSerializer(countries, many=True)
         return JsonResponse(countries_serializer.data, safe=False)
+    
+    elif requests.method == 'POST':
+        countries_data = JSONParser().parse(request)
+        countries_serializer = CountriesSerializer(data=countries_data)
+        if countries_serializer.is_valid():
+            countries_serializer.save()
+            return JsonResponse(countries_serializer.data, status=status.HTTP_201_CREATED)
+        return JsonResponse(countries_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+@api_view(['GET', 'POST', 'DELETE'])
+def countries_details(requests, pk):
+    try:
+        countries = countries.objects.get(pk=pk)
+    except countries.DoesNotExist:
+        return JsonResponse({'message': 'The country do not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
