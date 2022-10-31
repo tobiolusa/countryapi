@@ -24,7 +24,7 @@ def countries_list(requests):
     
     elif requests.method == 'POST':
         countries_data = JSONParser().parse(request)
-        countries_serializer = CountriesSerializer(data=countries_data)
+        countries_serializer = CountriesSerializer(data=countries_data, many=True)
         if countries_serializer.is_valid():
             countries_serializer.save()
             return JsonResponse(countries_serializer.data, status=status.HTTP_201_CREATED)
@@ -34,7 +34,7 @@ def countries_list(requests):
 @api_view(['GET', 'POST', 'DELETE'])
 def countries_details(requests, pk):
     try:
-        countries = countries.objects.get(pk=pk)
+        countries = Countries.objects.get(pk=pk)
     except countries.DoesNotExist:
         return JsonResponse({'message': 'The country do not exist'}, status=status.HTTP_404_NOT_FOUND)
     
